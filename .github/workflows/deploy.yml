@@ -1,4 +1,4 @@
-name: Deploy HTML to Somee
+name: Build and Deploy ASP.NET Core to Somee
 
 on:
   push:
@@ -6,17 +6,26 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
+      - name: Cai dat .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build va Publish project
+        run: dotnet publish MyWebApp/MyWebApp.csproj -c Release -o ./publish
+
+      - name: Deploy thu muc publish len Somee
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
           server-dir: /www.haodemo123.somee.com/
           protocol: ftp
